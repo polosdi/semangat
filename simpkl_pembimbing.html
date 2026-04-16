@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIMPKL – Panel Pembimbing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Poppins',sans-serif;background:linear-gradient(to bottom,#222243,#090913);color:#e2e8f0;min-height:100vh;display:flex;flex-direction:column}
+a{text-decoration:none;color:inherit}
+ul{list-style:none}
+img{max-width:100%;display:block}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#1e293b}
+::-webkit-scrollbar-thumb{background:#334155;border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:#ffffff55}
+h1{font-size:1.75rem;font-weight:700;color:#f1f5f9}
+h2{font-size:1.25rem;font-weight:600;color:#e2e8f0}
+h3{font-size:1rem;font-weight:600;color:#cbd5e1}
+p{font-size:.875rem;color:#94a3b8;line-height:1.6}
+
+/* HEADER */
+header{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(28,26,62,.97);backdrop-filter:blur(10px);border-bottom:1px solid rgba(36,38,151,.07);height:64px}
+header nav{display:flex;align-items:center;justify-content:space-between;height:100%;padding:0 24px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.05rem;color:#f1f5f9}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.85rem;color:#fff}
+.header-right{display:flex;align-items:center;gap:12px}
+.header-avatar{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600;color:#f1f5f9;cursor:pointer}
+.header-name{font-size:.82rem;color:#cbd5e1;font-weight:500}
+.header-role{font-size:.7rem;color:#64748b}
+.notif-btn{width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;color:#94a3b8;cursor:pointer;transition:.2s;position:relative}
+.notif-btn:hover{background:rgba(255,255,255,.1);color:#e2e8f0}
+.notif-dot{width:8px;height:8px;background:#ef4444;border-radius:50%;position:absolute;top:6px;right:6px;border:2px solid rgba(28,26,62,.97)}
+
+/* SIDEBAR */
+.sidebar-toggle{position:fixed;top:72px;left:248px;z-index:95;width:28px;height:28px;border-radius:50%;background:#1e293b;border:1px solid rgba(255,255,255,.1);color:#94a3b8;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.7rem;transition:all .3s}
+.sidebar-toggle:hover{background:#334155;color:#e2e8f0}
+.sidebar-toggle.collapsed{left:56px}
+.sidebar{width:260px;min-height:calc(100vh - 64px);background:linear-gradient(to bottom,#19173a);border-right:1px solid rgba(255,255,255,.07);padding:24px 0;position:fixed;top:64px;left:0;bottom:0;overflow-y:auto;transition:width .3s ease,transform .3s ease;z-index:90}
+.sidebar.collapsed{width:68px}
+.sidebar-section{padding:0 16px;margin-bottom:8px}
+.sidebar-section-title{font-size:.65rem;font-weight:600;letter-spacing:2px;color:#64748b;text-transform:uppercase;padding:12px 8px 6px;white-space:nowrap;overflow:hidden;transition:.3s}
+.sidebar.collapsed .sidebar-section-title{opacity:0;pointer-events:none}
+.sidebar-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:#94a3b8;font-size:.875rem;font-weight:500;transition:all .2s;white-space:nowrap;overflow:hidden;position:relative;margin-bottom:2px;cursor:pointer;border:1px solid transparent}
+.sidebar-item i{width:20px;text-align:center;font-size:1rem;flex-shrink:0;transition:color .2s}
+.sidebar-item span.label{transition:opacity .3s}
+.sidebar.collapsed .sidebar-item span.label{opacity:0;pointer-events:none}
+.sidebar.collapsed .badge{opacity:0}
+.sidebar-item:hover{color:#e2e8f0;background:rgba(255,255,255,.06)}
+.sidebar-item.active{color:#fff;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.15)}
+.sidebar-item.active i{color:#fff}
+.sidebar-item.danger:hover{color:#ef4444;background:rgba(239,68,68,.08)}
+.sidebar-item.danger i{color:#94a3b8}
+.sidebar-item.danger:hover i{color:#ef4444}
+.badge-sidebar{margin-left:auto;background:#ef4444;color:#fff;font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:99px;flex-shrink:0}
+.sidebar-divider{height:1px;background:rgba(255,255,255,.06);margin:10px 16px}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:85}
+.sidebar-overlay.active{display:block}
+
+/* LAYOUT */
+.layout-wrapper{display:flex;margin-top:64px;min-height:calc(100vh - 64px)}
+.main-content{margin-left:260px;flex:1;padding:32px;transition:margin-left .3s;width:100%;min-width:0}
+.main-content.sidebar-collapsed{margin-left:68px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;font-family:'Poppins',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;border:none}
+.btn-primary{background:#fff;color:#0f172a}
+.btn-primary:hover{background:#f1f5f9;transform:translateY(-1px);box-shadow:0 4px 14px rgba(255,255,255,.15)}
+.btn-warning{background:rgba(245,158,11,.1);color:#f59e0b;border:1px solid rgba(245,158,11,.25)}
+.btn-warning:hover{background:rgba(245,158,11,.2)}
+.btn-success{background:rgba(74,222,128,.1);color:#4ade80;border:1px solid rgba(74,222,128,.25)}
+.btn-success:hover{background:rgba(74,222,128,.2)}
+.btn-danger{background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.25)}
+.btn-danger:hover{background:rgba(239,68,68,.2)}
+.btn-sm{padding:6px 14px;font-size:.78rem}
+.btn-xs{padding:4px 10px;font-size:.72rem;border-radius:6px}
+
+/* BREADCRUMB */
+.breadcrumb{display:flex;align-items:center;gap:8px;font-size:.8rem;color:#475569;margin-bottom:24px}
+.breadcrumb span{color:#f1f5f9}
+.breadcrumb a{color:#64748b;cursor:pointer}
+.breadcrumb a:hover{color:#f1f5f9}
+
+/* SECTION TITLE */
+.section-title{font-size:.72rem;font-weight:600;color:#94a3b8;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;animation:fadeUp .5s ease both}
+
+/* WELCOME */
+.welcome-section{background:linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:28px 32px;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;gap:16px;animation:fadeUp .5s ease both}
+.status-badge{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);padding:8px 16px;border-radius:99px;font-size:.8rem;color:#e2e8f0}
+.status-dot{width:8px;height:8px;border-radius:50%;background:#4ade80;animation:pulse 2s infinite}
+
+/* STAT GRID */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:28px}
+.stat-card{background:#1e293b;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:20px;transition:transform .2s;animation:fadeUp .5s ease both;cursor:pointer}
+.stat-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.card-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:14px;background:rgba(255,255,255,.07)}
+.stat-card .number{font-size:2rem;font-weight:700;line-height:1;color:#f1f5f9;margin:8px 0}
+.stat-card .trend{font-size:.72rem;color:#94a3b8}
+
+/* QUICK GRID */
+.quick-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:28px}
+.quick-card{background:#1e293b;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:18px 20px;color:#94a3b8;font-size:.875rem;font-weight:500;display:flex;align-items:center;gap:12px;transition:all .2s;animation:fadeUp .5s ease both;cursor:pointer}
+.quick-card:hover{color:#e2e8f0;background:#263348;transform:translateY(-2px)}
+
+/* PANEL */
+.two-col-panels{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.panel{background:#1e293b;border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:20px;animation:fadeUp .5s ease both}
+.panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.panel-header h3{display:flex;align-items:center;gap:8px;font-size:.95rem;color:#e2e8f0}
+.panel-full{background:#1e293b;border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:20px;animation:fadeUp .5s ease both;margin-bottom:20px}
+
+/* TABLE */
+.table-responsive{overflow-x:auto;border-radius:12px;border:1px solid rgba(255,255,255,.06)}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+thead tr{background:#162032}
+thead th{padding:12px 16px;text-align:left;font-size:.72rem;color:#64748b;text-transform:uppercase}
+tbody tr{border-bottom:1px solid rgba(255,255,255,.04);transition:.15s}
+tbody tr:hover{background:rgba(255,255,255,.03)}
+tbody td{padding:12px 16px;color:#cbd5e1;vertical-align:middle}
+th i{margin-right:5px;font-size:.8rem;opacity:.7}
+
+/* PILLS */
+.pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:99px;font-size:.72rem;font-weight:600}
+.pill-green{background:rgba(74,222,128,.12);color:#4ade80;border:1px solid rgba(74,222,128,.25)}
+.pill-yellow{background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.25)}
+.pill-red{background:rgba(239,68,68,.12);color:#ef4444;border:1px solid rgba(239,68,68,.25)}
+.pill-blue{background:rgba(99,102,241,.12);color:#818cf8;border:1px solid rgba(99,102,241,.25)}
+.pill-gray{background:rgba(100,116,139,.12);color:#94a3b8;border:1px solid rgba(100,116,139,.25)}
+
+/* ACTIVITY */
+.activity-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.activity-item:last-child{border-bottom:none}
+.activity-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;background:rgba(255,255,255,.07)}
+.progress-bar{height:6px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;width:100%}
+.progress-fill{height:100%;border-radius:99px;transition:width 1s ease}
+
+/* BTN ACTION */
+.btn-action{padding:6px 10px;border-radius:6px;font-size:.9rem;transition:.3s;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid transparent;background:transparent}
+.btn-action:hover{opacity:.8}
+.btn-approve{color:#4ade80;border-color:rgba(74,222,128,.2);background:rgba(74,222,128,.1)}
+.btn-reject{color:#ef4444;border-color:rgba(239,68,68,.2);background:rgba(239,68,68,.1)}
+.btn-view{color:#818cf8;border-color:rgba(129,140,248,.2);background:rgba(129,140,248,.1)}
+.btn-edit{color:#f59e0b;border-color:rgba(245,158,11,.2);background:rgba(245,158,11,.1)}
+
+/* FORM */
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:.8rem;font-weight:600;color:#94a3b8;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.form-control{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px 14px;color:#e2e8f0;font-family:'Poppins',sans-serif;font-size:.875rem;outline:none;transition:.2s}
+.form-control:focus{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.08)}
+.form-control option{background:#1e293b;color:#e2e8f0}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+select.form-control{cursor:pointer}
+textarea.form-control{resize:vertical;min-height:80px}
+
+/* STAR RATING */
+.star-input{display:flex;gap:4px;flex-direction:row-reverse;justify-content:flex-end}
+.star-input input{display:none}
+.star-input label{font-size:1.4rem;color:#334155;cursor:pointer;transition:.2s}
+.star-input label:hover,.star-input label:hover~label,.star-input input:checked~label{color:#f59e0b}
+
+/* SEARCH */
+.search-bar{position:relative;flex:1}
+.search-bar input{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:9px 14px 9px 38px;color:#e2e8f0;font-family:'Poppins',sans-serif;font-size:.85rem;outline:none;transition:.2s}
+.search-bar input:focus{border-color:rgba(255,255,255,.2)}
+.search-bar i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#64748b;font-size:.85rem}
+.filter-bar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+
+/* PROFILE CARD */
+.profile-card{background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(139,92,246,.08));border:1px solid rgba(99,102,241,.2);border-radius:14px;padding:20px;display:flex;align-items:center;gap:16px}
+.avatar-lg{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.2rem;color:#fff;flex-shrink:0}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.active{display:flex}
+.modal{background:#1e293b;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:28px;max-width:520px;width:90%;max-height:85vh;overflow-y:auto;animation:fadeUp .3s ease}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-close{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:#94a3b8;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;font-size:.85rem}
+.modal-close:hover{background:rgba(255,255,255,.1);color:#e2e8f0}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:#1e293b;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:14px 20px;font-size:.85rem;color:#e2e8f0;z-index:300;animation:fadeUp .3s ease;display:flex;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,.4);min-width:280px}
+.toast.success{border-color:rgba(74,222,128,.3)}
+.toast.error{border-color:rgba(239,68,68,.3)}
+.toast.hidden{display:none}
+.toast-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:60px 20px;color:#475569}
+.empty-state i{font-size:2.5rem;margin-bottom:12px;display:block;opacity:.4}
+.empty-state p{color:#64748b;font-size:.875rem}
+
+/* TABS */
+.tab-bar{display:flex;gap:4px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:4px;margin-bottom:20px;width:fit-content}
+.tab-btn{padding:8px 18px;border-radius:7px;font-size:.8rem;font-weight:500;color:#64748b;cursor:pointer;transition:.2s;border:none;background:none;font-family:'Poppins',sans-serif}
+.tab-btn.active{background:rgba(255,255,255,.1);color:#f1f5f9;border:1px solid rgba(255,255,255,.12)}
+.tab-btn:hover:not(.active){color:#94a3b8;background:rgba(255,255,255,.03)}
+
+/* CALENDAR ABSENSI */
+.absensi-calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:20px}
+.cal-header{text-align:center;font-size:.65rem;font-weight:600;color:#64748b;text-transform:uppercase;padding:4px}
+.cal-day{aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.75rem;cursor:pointer;transition:.2s;border:1px solid transparent;font-weight:500}
+.cal-day:hover:not(.empty){border-color:rgba(255,255,255,.15)}
+.cal-day.empty{background:transparent;cursor:default}
+.cal-day.hadir{background:rgba(74,222,128,.12);color:#4ade80;border-color:rgba(74,222,128,.2)}
+.cal-day.izin{background:rgba(245,158,11,.12);color:#f59e0b;border-color:rgba(245,158,11,.2)}
+.cal-day.sakit{background:rgba(99,102,241,.12);color:#818cf8;border-color:rgba(99,102,241,.2)}
+.cal-day.alpha{background:rgba(239,68,68,.12);color:#ef4444;border-color:rgba(239,68,68,.2)}
+.cal-day.today{box-shadow:0 0 0 2px #818cf8}
+.cal-day.libur{background:rgba(255,255,255,.03);color:#334155}
+
+/* PROGRESS CIRCLE */
+.progress-ring{transform:rotate(-90deg)}
+.progress-ring circle{transition:stroke-dashoffset .8s ease}
+
+/* NILAI FORM */
+.nilai-card{background:#162032;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:16px;margin-bottom:12px;transition:.2s}
+.nilai-card:hover{border-color:rgba(255,255,255,.12)}
+.nilai-slider{width:100%;-webkit-appearance:none;appearance:none;height:6px;border-radius:99px;background:rgba(255,255,255,.06);outline:none;cursor:pointer}
+.nilai-slider::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#6366f1;cursor:pointer;border:2px solid rgba(255,255,255,.2)}
+
+/* BIMBINGAN CHAT */
+.chat-bubble{padding:12px 16px;border-radius:12px;margin-bottom:10px;font-size:.85rem;max-width:80%;line-height:1.6}
+.chat-bubble.siswa{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:#cbd5e1;align-self:flex-start}
+.chat-bubble.pembimbing{background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.25);color:#c7d2fe;align-self:flex-end}
+.chat-container{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;padding:12px;background:rgba(0,0,0,.15);border-radius:10px;border:1px solid rgba(255,255,255,.05);margin-bottom:12px}
+.chat-meta{font-size:.68rem;color:#64748b;margin-bottom:4px}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);width:260px!important}
+  .sidebar.mobile-open{transform:translateX(0)}
+  .main-content{margin-left:0!important;padding:20px 16px}
+  .two-col-panels{grid-template-columns:1fr!important}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .form-row{grid-template-columns:1fr}
+  .sidebar-toggle{display:none}
+}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(.85);opacity:.5}}
+.delay-1{animation-delay:.08s}.delay-2{animation-delay:.16s}.delay-3{animation-delay:.24s}
+.delay-4{animation-delay:.32s}.delay-5{animation-delay:.40s}.delay-6{animation-delay:.48s}
+
+/* PAGE */
+.page{display:none}.page.active{display:block}
+
+/* KOMPETISI CHECKLIST */
+.komp-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:8px;transition:.2s}
+.komp-item:hover{background:rgba(255,255,255,.05)}
+.komp-check{width:22px;height:22px;border-radius:6px;border:2px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s;flex-shrink:0}
+.komp-check.checked{background:#4ade80;border-color:#4ade80;color:#fff}
+.komp-label{flex:1;font-size:.875rem;color:#cbd5e1}
+.komp-label small{display:block;font-size:.72rem;color:#64748b;margin-top:2px}
+
+/* DETAIL CARD */
+.detail-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:.85rem}
+.detail-row:last-child{border-bottom:none}
+.detail-label{color:#64748b;font-weight:500}
+.detail-value{color:#e2e8f0;font-weight:500;text-align:right}
+
+/* PENEMPATAN */
+.location-card{background:#162032;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:16px;transition:.2s;cursor:pointer}
+.location-card:hover{border-color:rgba(99,102,241,.3);background:rgba(99,102,241,.05)}
+.location-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:12px}
+
+.sidebar-hamburger{display:none;background:none;border:none;color:#94a3b8;font-size:1.2rem;cursor:pointer;padding:4px;margin-right:8px}
+@media(max-width:768px){.sidebar-hamburger{display:flex;align-items:center}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <nav>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="sidebar-hamburger" id="hamburger"><i class="fas fa-bars"></i></button>
+      <div class="logo">
+        <div class="logo-icon"><i class="fas fa-graduation-cap"></i></div>
+        SIMPKL
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="notif-btn" onclick="showToast('Tidak ada notifikasi baru','info')">
+        <i class="fas fa-bell" style="font-size:.85rem"></i>
+        <div class="notif-dot"></div>
+      </div>
+      <div style="text-align:right">
+        <div class="header-name">Budi Santoso, S.T.</div>
+        <div class="header-role">Pembimbing PKL</div>
+      </div>
+      <div class="header-avatar">BS</div>
+    </div>
+  </nav>
+</header>
+
+<!-- SIDEBAR TOGGLE -->
+<button class="sidebar-toggle" id="sidebarToggle" title="Toggle Sidebar">
+  <i class="fas fa-chevron-left" id="toggleIcon"></i>
+</button>
+
+<!-- LAYOUT -->
+<div class="layout-wrapper">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Utama</div>
+      <div class="sidebar-item active" data-page="dashboard">
+        <i class="fas fa-th-large"></i><span class="label">Dashboard</span>
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Siswa Bimbingan</div>
+      <div class="sidebar-item" data-page="siswa">
+        <i class="fas fa-user-graduate"></i><span class="label">Daftar Siswa</span>
+      </div>
+      <div class="sidebar-item" data-page="penempatan">
+        <i class="fas fa-map-marker-alt"></i><span class="label">Penempatan PKL</span>
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Monitoring PKL</div>
+      <div class="sidebar-item" data-page="jurnal">
+        <i class="fas fa-book-open"></i><span class="label">Jurnal Harian</span>
+        <span class="badge-sidebar" id="badge-jurnal">3</span>
+      </div>
+      <div class="sidebar-item" data-page="absensi">
+        <i class="fas fa-calendar-check"></i><span class="label">Absensi PKL</span>
+      </div>
+      <div class="sidebar-item" data-page="laporan">
+        <i class="fas fa-file-alt"></i><span class="label">Laporan PKL</span>
+        <span class="badge-sidebar" id="badge-laporan">2</span>
+      </div>
+      <div class="sidebar-item" data-page="bimbingan">
+        <i class="fas fa-comments"></i><span class="label">Bimbingan</span>
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Penilaian</div>
+      <div class="sidebar-item" data-page="nilai">
+        <i class="fas fa-star"></i><span class="label">Input Nilai</span>
+      </div>
+      <div class="sidebar-item" data-page="kompetensi">
+        <i class="fas fa-tasks"></i><span class="label">Kompetensi</span>
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-item danger" onclick="confirmLogout()">
+        <i class="fas fa-sign-out-alt"></i><span class="label">Logout</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content" id="mainContent">
+
+    <!-- ==================== DASHBOARD ==================== -->
+    <div class="page active" id="page-dashboard">
+      <div class="breadcrumb"><i class="fas fa-home"></i> <i class="fas fa-chevron-right" style="font-size:.6rem"></i> <span>Dashboard</span></div>
+
+      <div class="welcome-section">
+        <div>
+          <h1>Selamat Datang, Pak Budi 👋</h1>
+          <p style="margin-top:6px">Pembimbing PKL · Tahun Ajaran 2024/2025</p>
+          <div class="status-badge" style="margin-top:14px;display:inline-flex">
+            <div class="status-dot"></div>
+            Aktif Membimbing · 8 Siswa
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:.75rem;color:#64748b">Hari ini</div>
+          <div style="font-size:1.5rem;font-weight:700;color:#f1f5f9" id="clock-display">--:--</div>
+          <div style="font-size:.78rem;color:#94a3b8" id="date-display">--</div>
+        </div>
+      </div>
+
+      <!-- STAT CARDS -->
+      <div class="section-title">Statistik Bimbingan</div>
+      <div class="stat-grid">
+        <div class="stat-card delay-1" onclick="navigateTo('siswa')">
+          <div class="card-icon" style="background:rgba(99,102,241,.15)"><i class="fas fa-user-graduate" style="color:#818cf8"></i></div>
+          <div style="font-size:.8rem;color:#94a3b8">Siswa Bimbingan</div>
+          <div class="number">8</div>
+          <div class="trend"><i class="fas fa-circle" style="color:#4ade80;font-size:.5rem"></i> Semua aktif PKL</div>
+        </div>
+        <div class="stat-card delay-2" onclick="navigateTo('jurnal')">
+          <div class="card-icon" style="background:rgba(245,158,11,.15)"><i class="fas fa-book-open" style="color:#f59e0b"></i></div>
+          <div style="font-size:.8rem;color:#94a3b8">Jurnal Pending</div>
+          <div class="number" id="dash-pending-jurnal">3</div>
+          <div class="trend"><i class="fas fa-clock" style="color:#f59e0b;font-size:.5rem"></i> Menunggu validasi</div>
+        </div>
+        <div class="stat-card delay-3" onclick="navigateTo('laporan')">
+          <div class="card-icon" style="background:rgba(239,68,68,.15)"><i class="fas fa-file-alt" style="color:#ef4444"></i></div>
+          <div style="font-size:.8rem;color:#94a3b8">Laporan Pending</div>
+          <div class="number" id="dash-pending-laporan">2</div>
+          <div class="trend"><i class="fas fa-exclamation-circle" style="color:#ef4444;font-size:.5rem"></i> Perlu direview</div>
+        </div>
+        <div class="stat-card delay-4" onclick="navigateTo('absensi')">
+          <div class="card-icon" style="background:rgba(74,222,128,.15)"><i class="fas fa-calendar-check" style="color:#4ade80"></i></div>
+          <div style="font-size:.8rem;color:#94a3b8">Kehadiran Rata-rata</div>
+          <div class="number">87%</div>
+          <div class="trend"><i class="fas fa-arrow-up" style="color:#4ade80;font-size:.5rem"></i> Minggu ini</div>
+        </div>
+      </div>
+
+      <!-- 2 PANEL ROW -->
+      <div class="two-col-panels">
+        <!-- RECENT JURNAL -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3><i class="fas fa-book-open" style="color:#f59e0b"></i> Jurnal Terbaru</h3>
+            <button class="btn btn-warning btn-sm" onclick="navigateTo('jurnal')">Lihat Semua</button>
+          </div>
+          <div id="dash-jurnal-list">
+            <div class="activity-item">
+              <div class="activity-icon" style="background:rgba(74,222,128,.12);color:#4ade80"><i class="fas fa-check" style="font-size:.7rem"></i></div>
+              <div style="flex:1">
+                <div style="font-size:.83rem;font-weight:600;color:#f1f5f9">Andi Pratama</div>
+                <div style="font-size:.75rem;color:#64748b">Instalasi server Linux · 15 Apr 2025</div>
+              </div>
+              <span class="pill pill-green">VALID</span>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon" style="background:rgba(245,158,11,.12);color:#f59e0b"><i class="fas fa-clock" style="font-size:.7rem"></i></div>
+              <div style="flex:1">
+                <div style="font-size:.83rem;font-weight:600;color:#f1f5f9">Siti Rahma</div>
+                <div style="font-size:.75rem;color:#64748b">Debugging PHP aplikasi · 14 Apr 2025</div>
+              </div>
+              <span class="pill pill-yellow">PENDING</span>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon" style="background:rgba(245,158,11,.12);color:#f59e0b"><i class="fas fa-clock" style="font-size:.7rem"></i></div>
+              <div style="flex:1">
+                <div style="font-size:.83rem;font-weight:600;color:#f1f5f9">Dedi Kurniawan</div>
+                <div style="font-size:.75rem;color:#64748b">Desain database MySQL · 14 Apr 2025</div>
+              </div>
+              <span class="pill pill-yellow">PENDING</span>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon" style="background:rgba(239,68,68,.12);color:#ef4444"><i class="fas fa-times" style="font-size:.7rem"></i></div>
+              <div style="flex:1">
+                <div style="font-size:.83rem;font-weight:600;color:#f1f5f9">Rini Susanti</div>
+                <div style="font-size:.75rem;color:#64748b">Laporan tidak lengkap · 13 Apr 2025</div>
+              </div>
+              <span class="pill pill-red">TOLAK</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ABSENSI SUMMARY -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3><i class="fas fa-chart-pie" style="color:#818cf8"></i> Ringkasan Absensi</h3>
+            <button class="btn btn-sm" style="background:rgba(129,140,248,.1);color:#818cf8;border:1px solid rgba(129,140,248,.2)" onclick="navigateTo('absensi')">Detail</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+                <span style="font-size:.8rem;color:#4ade80"><i class="fas fa-check-circle"></i> Hadir</span>
+                <span style="font-size:.8rem;font-weight:600;color:#f1f5f9">142 hari</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" style="width:78%;background:#4ade80"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+                <span style="font-size:.8rem;color:#f59e0b"><i class="fas fa-envelope"></i> Izin</span>
+                <span style="font-size:.8rem;font-weight:600;color:#f1f5f9">18 hari</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" style="width:10%;background:#f59e0b"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+                <span style="font-size:.8rem;color:#818cf8"><i class="fas fa-procedures"></i> Sakit</span>
+                <span style="font-size:.8rem;font-weight:600;color:#f1f5f9">12 hari</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" style="width:7%;background:#818cf8"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+                <span style="font-size:.8rem;color:#ef4444"><i class="fas fa-times-circle"></i> Alpha</span>
+                <span style="font-size:.8rem;font-weight:600;color:#f1f5f9">6 hari</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" style="width:3%;background:#ef4444"></div></div>
+            </div>
+          </div>
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between">
+            <span style="font-size:.78rem;color:#64748b">Total Hari Kerja</span>
+            <span style="font-size:.85rem;font-weight:600;color:#f1f5f9">178 hari</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUICK ACTIONS -->
+      <div class="section-title" style="margin-top:28px">Akses Cepat</div>
+      <div class="quick-grid">
+        <div class="quick-card delay-1" onclick="navigateTo('jurnal')">
+          <div style="width:36px;height:36px;border-radius:8px;background:rgba(245,158,11,.12);display:flex;align-items:center;justify-content:center"><i class="fas fa-book-open" style="color:#f59e0b"></i></div>
+          Validasi Jurnal
+        </div>
+        <div class="quick-card delay-2" onclick="navigateTo('laporan')">
+          <div style="width:36px;height:36px;border-radius:8px;background:rgba(239,68,68,.12);display:flex;align-items:center;justify-content:center"><i class="fas fa-file-alt" style="color:#ef4444"></i></div>
+          Review Laporan
+        </div>
+        <div class="quick-card delay-3" onclick="navigateTo('nilai')">
+          <div style="width:36px;height:36px;border-radius:8px;background:rgba(74,222,128,.12);display:flex;align-items:center;justify-content:center"><i class="fas fa-star" style="color:#4ade80"></i></div>
+          Input Nilai
+        </div>
+        <div class="quick-card delay-4" onclick="navigateTo('bimbingan')">
+          <div style="width:36px;height:36px;border-radius:8px;background:rgba(99,102,241,.12);display:flex;align-items:center;justify-content:center"><i class="fas fa-comments" style="color:#818cf8"></i></div>
+          Bimbingan
+        </div>
+        <div class="quick-card delay-5" onclick="navigateTo('absensi')">
+          <div style="width:36px;height:36px;border-radius:8px;background:rgba(20,184,166,.12);display:flex;align-items:center;justify-content:center"><i class="fas fa-calendar-check" style="color:#2dd4bf"></i></div>
+          Cek Absensi
+        </div>
+        <div class="quick-card delay-6" onclick="navigateTo('kompetensi')">
+          <div style="width:36px;height:36px;border-radius:8px;background:rgba(168,85,247,.12);display:flex;align-items:center;justify-content:center"><i class="fas fa-tasks" style="color:#c084fc"></i></div>
+          Kompetensi
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== DAFTAR SISWA ==================== -->
+    <div class="page" id="page-siswa">
+      <div class="breadcrumb"><i class="fas fa-home"></i> <i class="fas fa-chevron-right" style="font-size:.6rem"></i> <span>Daftar Siswa Bimbingan</span></div>
+
+      <div class="panel-full">
+        <div class="panel-header">
+          <div style="display:flex;align-items:center;gap:15px">
+            <div style="background:rgba(99,102,241,.1);padding:10px;border-radius:10px">
+              <i class="fas fa-user-graduate" style="color:#818cf8;font-size:1.5rem"></i>
+            </div>
+            <div>
+              <h3 style="margin:0;color:#f1f5f9;font-size:1rem">Daftar Siswa Bimbingan</h3>
+              <p style="color:#8e8ea9;font-size:.8rem;margin:0">Total 8 siswa aktif PKL di bawah bimbingan Anda.</p>
+            </div>
+          </div>
+          <button class="btn btn-sm" style="background:rgba(99,102,241,.1);color:#818cf8;border:1px solid rgba(99,102,241,.2)" onclick="openModal('modal-add-siswa')">
+            <i class="fas fa-plus"></i> Tambah Siswa
+          </button>
+        </div>
+        <div class="filter-bar">
+          <div class="search-bar"><i class="fas fa-search"></i><input type="text" placeholder="Cari siswa..." id="search-siswa" oninput="filterSiswa()"></div>
+          <select class="form-control" style="width:auto" id="filter-kelas" onchange="filterSiswa()">
+            <option value="">Semua Kelas</option>
+            <option value="XII RPL 1">XII RPL 1</option>
+            <option value="XII RPL 2">XII RPL 2</option>
+            <option value="XII TKJ">XII TKJ</option>
+          </select>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead><tr>
+              <th><i class="fas fa-hashtag"></i> No</th>
+              <th><i class="fas fa-user"></i> Nama Siswa</th>
+              <th><i class="fas fa-id-card"></i> NIS</th>
+              <th><i class="fas fa-chalkboard"></i> Kelas</th>
+              <th><i class="fas fa-building"></i> Tempat PKL</th>
+              <th><i class="fas fa-circle"></i> Status</th>
+              <th style="text-align:center"><i class="fas fa-cog"></i> Aksi</th>
+            </tr></thead>
+            <tbody id="siswa-tbody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== PENEMPATAN PKL ==================== -->
+    <div class="page" id="page-penempatan">
+      <div class="breadcrumb"><i class="fas fa-home"></i> <i class="fas fa-chevron-right" style="font-size:.6rem"></i> <span>Penempatan PKL</span></div>
+
+      <div class="panel-full">
+        <div class="panel-header">
+          <div style="display:flex;align-items:center;gap:15px">
+            <div style="background:rgba(20,184,166,.1);padding:10px;border-radius:10px"><i class="fas fa-map-marker-alt" style="color:#2dd4bf;font-size:1.5rem"></i></div>
+            <div>
+              <h3 style="margin:0;color:#f1f5f9">Penempatan PKL</h3>
+              <p style="margin:0;color:#64748b;font-size:.8rem">Informasi lokasi & dunia usaha tempat siswa melaksanakan PKL</p>
+            </div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px" id="penempatan-grid"></div>
+      </div>
+    </div>
+
+    <!-- ==================== JURNAL HARIAN ==================== -->
+    <div class="page" id="page-jurnal">
+      <div class="breadcrumb"><i class="fas fa-home"></i> <i class="fas fa-chevron-right" style="font-size:.6rem"></i> <span>Jurnal Harian</span></div>
+
+      <div class="panel-full">
+        <div class="panel-header">
+          <div style="display:flex;align-items:center;gap:15px">
+            <div style="background:rgba(245,158,11,.1);padding:10px;border-radius:10px"><i class="fas fa-book-open" style="color:#f59e0b;font-size:1.5rem"></i></div>
+            <div>
+              <h3 style="margin:0;color:#f1f5f9">Validasi Jurnal Harian</h3>
+              <p style="color:#8e8ea9;font-size:.8rem;margin:0">Review dan validasi kegiatan harian siswa bimbingan.</p>
+            </div>
+          </div>
+        </div>
+        <div class="filter-bar">
+          <div class="search-bar"><i class="fas fa-search"></i><input type="text" placeholder="Cari siswa atau kegiatan..." id="search-jurnal" oninput="filterJurnal()"></div>
+          <div class="tab-bar" style="margin-bottom:0">
+            <button class="tab-btn active" onclick="setJurnalFilter('all',this)">Semua</button>
+            <button class="tab-btn" onclick="setJurnalFilter('pending',this)">Pending</button>
+            <button class="tab-btn" onclick="setJurnalFilter('valid',this)">Valid</button>
+            <button class="tab-btn" onclick="setJurnalFilter('tolak',this)">Tolak</button>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead><tr>
+              <th><i class="fas fa-user"></i> Siswa</th>
+              <th><i class="fas fa-calendar-alt"></i> Tanggal & Waktu</th>
+              <th><i class="fas fa-tasks"></i> Kegiatan</th>
+              <th><i class="fas fa-info-circle"></i> Status</th>
+              <th style="text-align:center"><i class="fas fa-cog"></i> Aksi</th>
+            </tr></thead>
+            <tbody id="jurnal-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== ABSENSI PKL ==================== -->
+    <div class="page" id="page-absensi">
+      <div class="breadcrumb"><i class="fas fa-home"></i> <i class="fas fa-chevron-right" style="font-size:.6rem"></i> <span>Absensi PKL</span></div>
+
+      <div class="panel-full">
+        <div class="panel-header">
+          <div style="display:flex;align-items:center;gap:15px">
+            <div style="background:rgba(74,222,128,.1);padding:10px;border-radius:10px"><i class="fas fa-calendar-check" style="color:#4ade80;font-size:1.5rem"></i></div>
+            <div>
+              <h3 style="margin:0;color:#f1f5f9">Monitoring Absensi PKL</h3>
+              <p style="margin:0;color:#64748b;font-size:.8rem">Rekap kehadiran siswa selama pelaksanaan PKL</p>
+            </div>
+          </div>
+          <select class="form-control" style="width:auto" id="absensi-siswa-select" onchange="renderAbsensiCalendar()">
+          </select>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <h3 style="font-size:.9rem;color:#94a3b8">April 2025</h3>
+              <div style="display:flex;gap:8px">
+                <div style="display:flex;align-items:center;gap:5px;font-size:.72rem;color:#4ade80"><div style="width:10px;height:10px;border-radius:3px;background:rgba(74,222,128,.2)"></div>Hadir</div>
+                <div style="display:flex;align-items:center;gap:5px;font-size:.72rem;color:#f59e0b"><div style="width:10px;height:10px;border-radius:3px;background:rgba(245,158,11,.2)"></div>Izin</div>
+                <div style="display:flex;align-items:center;gap:5px;font-size:.72rem;color:#818cf8"><div style="width:10px;height:10px;border-radius:3px;background:rgba(99,102,241,.2)"></div>Sakit</div>
+                <div style="display:flex;align-items:center;gap:5px;font-size:.72rem;color:#ef4444"><div style="width:10px;height:10px;border-radius:3px;background:rgba(239,68,68,.2)"></div>Alpha</div>
+              </div>
+            </div>
+            <div class="absensi-calendar" id="absensi-calendar"></div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="background:#162032;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:16px">
+              <div style="font-size:.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Rekap Bulan Ini</div>
+              <div id="absensi-rekap"></div>
+            </div>
+            <div style="background:#162032;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:16px">
+              <div style="font-size:.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Total Keseluruhan</div>
+              <div id="absensi-total"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== LAPORAN PKL ==================== -->
+    <div class="page" id="page-laporan">
+      <div class="breadcrumb"><i class="fas fa-home"></i> <i class="fas fa-chevron-right" style="font-size:.6rem"></i> <span>Laporan PKL</span></div>
+
+      <div class="panel-full">
+        <div class="panel-header">
+          <div style="display:flex;align-items:center;gap:15px">
+            <div style="background:rgba(239,68,68,.1);padding:10px;border-radius:10px"><i class="fas fa-file-alt" style="color:#ef4444;font-size:1.5rem"></i></div>
+            <div>
+              <h3 style="margin:0;color:#f1f5f9">Review Laporan PKL</h3>
+              <p style="margin:0;color:#64748b;font-size:.8rem">Periksa dan validasi laporan akhir PKL siswa</p>
+            </div>
+          </div>
+        </div>
+        <div class="filter-bar">
+          <div class="tab-bar" style="margin-bottom:0">
+            <button class="tab-btn active" onclick="setLaporanFilter('all',this)">Semua</button>
+            <button class="tab-btn" onclick="setLaporanFilter('pending',this)">Pending</button>
+            <button class="tab-btn" onclick="setLaporanFilter('approved',this)">Disetujui</button>
+            <button class="tab-btn" onclick="setLaporanFilter('revisi',this)">Revisi</button>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead><tr>
+              <th><i class="fas fa-user"></i> Siswa</th>
+              <th><i class="fas fa-file-pdf"></i> Judul Laporan</th>
+              <th><i class="fas fa-calendar"></i> Tgl Submit</th>
+              <th><i class="fas fa-clock"></i> Progres</th>
+              <th><i class="fas fa-info-circle"></i> Status</th>
+              <th style="text-align:center"><i class="fas fa-cog"></i> Aksi</th>
+            </tr></thead>
+            <tbody id="laporan-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== BIMBINGAN ==================== -->
+    <div class="page" id="page-bimbingan">
+      <div class="breadcrumb"><i class="fas fa-home"></i> <i class="fas fa-chevron-right" style="font-size:.6rem"></i> <span>Bimbingan & Konsultasi</span></div>
+
+      <div style="display:grid;grid-template-columns:300px 1fr;gap:20px">
+        <!-- LIST SISWA -->
+        <div class="panel" style="height:fit-content">
+          <div style="font-size:.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Siswa Bimbingan</div>
+          <div id="bimbingan-list" style="display:flex;flex-direction:column;gap:4px"></div>
+        </div>
+
+        <!-- CHAT AREA -->
+        <div class="panel">
+          <div id="bimbingan-header" style="margin-bottom:16px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div class="avatar-lg" id="bimbingan-avatar" style="width:44px;height:44px;font-size:.9rem">AP</div>
+              <div>
+                <div style="font-weight:600;color:#f1f5f9" id="bimbingan-nama">Andi Pratama</div>
+                <div style="font-size:.75rem;color:#64748b" id="bimbingan-kelas">XII RPL 1 · PT Teknologi Maju</div>
+              </div>
+            </div>
+          </div>
+          <div class="chat-container" id="chat-container"></div>
+          <div style="display:flex;gap:8px">
+            <input type="text" class="form-control" id="chat-input" placeholder="Tulis pesan bimbingan..." style="flex:1" onkeydown="if(event.key==='Enter')sendChat()">
+            <button class="btn btn-primary btn-sm" onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== INPUT NILAI ==================== -->
+    <div class="page" id="page-nilai">
+      <div class="breadcrumb"><i class="fas fa-home"></i> <i class="fas fa-chevron-right" style="font-size:.6rem"></i> <span>Input Nilai PKL</span></div>
+
+      <div class="panel-full">
+        <div class="panel-header">
+          <div style="display:flex;align-items:center;gap:15px">
+            <div style="background:rgba(74,222,128,.1);padding:10px;border-radius:10px"><i class="fas fa-star" style="color:#4ade80;font-size:1.5rem"></i></div>
+            <div>
+              <h3 style="margin:0;color:#f1f5f9">Input Nilai PKL</h3>
+              <p style="margin:0;color:#64748b;font-size:.8rem">Berikan penilaian akhir untuk setiap siswa bimbingan</p>
+            </div>
+          </div>
+          <button class="btn btn-success btn-sm" onclick="saveAllNilai()"><i class="fas fa-save"></i> Simpan Semua</button>
+        </div>
+        <div id="nilai-cards"></div>
+      </div>
+    </div>
+
+    <!-- ==================== KOMPETENSI ==================== -->
+    <div class="page" id="page-kompetensi">
+      <div class="breadcrumb"><i class="fas fa-home"></i> <i class="fas fa-chevron-right" style="font-size:.6rem"></i> <span>Penilaian Kompetensi</span></div>
+
+      <div style="display:grid;grid-template-columns:260px 1fr;gap:20px">
+        <div class="panel" style="height:fit-content">
+          <div style="font-size:.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Pilih Siswa</div>
+          <div id="komp-siswa-list" style="display:flex;flex-direction:column;gap:4px"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <h3 id="komp-title">Kompetensi Andi Pratama</h3>
+            <div>
+              <span id="komp-progress-text" style="font-size:.82rem;color:#4ade80;font-weight:600">7/10 tercapai</span>
+            </div>
+          </div>
+          <div style="margin-bottom:12px">
+            <div class="progress-bar"><div class="progress-fill" style="background:linear-gradient(90deg,#6366f1,#4ade80)" id="komp-bar"></div></div>
+          </div>
+          <div id="komp-list"></div>
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,.06)">
+            <button class="btn btn-primary btn-sm" onclick="saveKompetensi()"><i class="fas fa-save"></i> Simpan Penilaian</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- SIDEBAR OVERLAY -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-siswa-detail">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-siswa-nama">Detail Siswa</h3>
+      <button class="modal-close" onclick="closeModal('modal-siswa-detail')"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="modal-siswa-content"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-jurnal-detail">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Detail Jurnal</h3>
+      <button class="modal-close" onclick="closeModal('modal-jurnal-detail')"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="modal-jurnal-content"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-laporan-detail">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-laporan-title">Detail Laporan</h3>
+      <button class="modal-close" onclick="closeModal('modal-laporan-detail')"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="modal-laporan-content"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-add-siswa">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Tambah Siswa Bimbingan</h3>
+      <button class="modal-close" onclick="closeModal('modal-add-siswa')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="form-group"><label class="form-label">Nama Lengkap</label><input class="form-control" placeholder="Masukkan nama siswa"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">NIS</label><input class="form-control" placeholder="NIS"></div>
+      <div class="form-group"><label class="form-label">Kelas</label><select class="form-control"><option>XII RPL 1</option><option>XII RPL 2</option><option>XII TKJ</option></select></div>
+    </div>
+    <div class="form-group"><label class="form-label">Tempat PKL</label><input class="form-control" placeholder="Nama perusahaan/instansi"></div>
+    <div class="form-group"><label class="form-label">Kontak</label><input class="form-control" placeholder="No. HP / Email"></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px" onclick="closeModal('modal-add-siswa');showToast('Siswa berhasil ditambahkan','success')">
+      <i class="fas fa-plus"></i> Tambah Siswa
+    </button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast hidden" id="toast">
+  <div class="toast-icon" id="toast-icon"></div>
+  <span id="toast-msg">Pesan toast</span>
+</div>
+
+<script>
+// ============================================================
+// DATA MOCK
+// ============================================================
+const siswaData = [
+  {id:1, nama:'Andi Pratama',       nis:'2024001', kelas:'XII RPL 1', tempat:'PT Teknologi Maju',         alamat:'Jl. Sudirman No.45, Jakarta', kontak:'081234567890', status:'aktif',   inisial:'AP', color:'#6366f1'},
+  {id:2, nama:'Siti Rahma',         nis:'2024002', kelas:'XII RPL 1', tempat:'CV Digital Kreatif',        alamat:'Jl. Gatot Subroto No.12, Bandung', kontak:'081234567891', status:'aktif',   inisial:'SR', color:'#ec4899'},
+  {id:3, nama:'Dedi Kurniawan',     nis:'2024003', kelas:'XII RPL 2', tempat:'PT Solusi IT Indonesia',    alamat:'Jl. Asia Afrika No.8, Bandung', kontak:'081234567892', status:'aktif',   inisial:'DK', color:'#f59e0b'},
+  {id:4, nama:'Rini Susanti',       nis:'2024004', kelas:'XII RPL 2', tempat:'Dinas Kominfo Kota',        alamat:'Jl. Merdeka No.1, Bekasi', kontak:'081234567893', status:'aktif',   inisial:'RS', color:'#10b981'},
+  {id:5, nama:'Fajar Hidayat',      nis:'2024005', kelas:'XII TKJ',   tempat:'PT Jaringan Nusantara',     alamat:'Jl. Thamrin No.22, Jakarta', kontak:'081234567894', status:'aktif',   inisial:'FH', color:'#3b82f6'},
+  {id:6, nama:'Dewi Anggraeni',     nis:'2024006', kelas:'XII TKJ',   tempat:'CV Media Inovasi',          alamat:'Jl. Diponegoro No.55, Surabaya', kontak:'081234567895', status:'aktif',   inisial:'DA', color:'#8b5cf6'},
+  {id:7, nama:'Rizky Ramadhan',     nis:'2024007', kelas:'XII RPL 1', tempat:'PT Startup Digital',        alamat:'Jl. Pemuda No.17, Yogyakarta', kontak:'081234567896', status:'aktif',   inisial:'RR', color:'#ef4444'},
+  {id:8, nama:'Maya Sari',          nis:'2024008', kelas:'XII RPL 2', tempat:'Badan Usaha Milik Daerah',  alamat:'Jl. Pahlawan No.3, Semarang', kontak:'081234567897', status:'aktif',   inisial:'MS', color:'#2dd4bf'},
+];
+
+const jurnalData = [
+  {id:1, siswa_id:1, nama:'Andi Pratama',    tanggal:'2025-04-15', jam_masuk:'08:00', jam_keluar:'16:00', kegiatan:'Instalasi dan konfigurasi server Linux Ubuntu 22.04 untuk kebutuhan pengembangan aplikasi web perusahaan.', status:'valid'},
+  {id:2, siswa_id:2, nama:'Siti Rahma',      tanggal:'2025-04-14', jam_masuk:'08:30', jam_keluar:'16:30', kegiatan:'Debugging dan perbaikan bug pada aplikasi PHP berbasis framework CodeIgniter. Berhasil menyelesaikan 3 issue dari tracker.', status:'pending'},
+  {id:3, siswa_id:3, nama:'Dedi Kurniawan',  tanggal:'2025-04-14', jam_masuk:'07:30', jam_keluar:'15:30', kegiatan:'Perancangan dan pembuatan skema database MySQL untuk sistem manajemen inventaris gudang.', status:'pending'},
+  {id:4, siswa_id:4, nama:'Rini Susanti',    tanggal:'2025-04-13', jam_masuk:'08:00', jam_keluar:'14:00', kegiatan:'Laporan harian tidak diisi dengan lengkap, hanya menulis 2 kalimat tanpa detail kegiatan.', status:'tolak'},
+  {id:5, siswa_id:5, nama:'Fajar Hidayat',   tanggal:'2025-04-13', jam_masuk:'08:00', jam_keluar:'16:00', kegiatan:'Konfigurasi jaringan LAN dan setting VLAN di switch Cisco untuk memisahkan traffic departemen keuangan dan IT.', status:'valid'},
+  {id:6, siswa_id:6, nama:'Dewi Anggraeni',  tanggal:'2025-04-12', jam_masuk:'09:00', jam_keluar:'17:00', kegiatan:'Membuat desain UI/UX mockup untuk aplikasi mobile toko online menggunakan Figma. Telah selesai 4 halaman utama.', status:'valid'},
+  {id:7, siswa_id:7, nama:'Rizky Ramadhan',  tanggal:'2025-04-11', jam_masuk:'08:00', jam_keluar:'16:00', kegiatan:'Pengembangan fitur autentikasi JWT pada REST API NodeJS Express. Testing dengan Postman sudah berhasil.', status:'pending'},
+  {id:8, siswa_id:8, nama:'Maya Sari',        tanggal:'2025-04-10', jam_masuk:'08:00', jam_keluar:'15:00', kegiatan:'Pengelolaan dan update konten website BUMD menggunakan CMS WordPress. Upload berita dan galeri foto kegiatan.', status:'valid'},
+];
+
+const laporanData = [
+  {id:1, siswa_id:1, nama:'Andi Pratama',    judul:'Laporan PKL: Administrasi Server Linux di PT Teknologi Maju',       tgl_submit:'2025-04-10', progres:85, status:'pending',  catatan:''},
+  {id:2, siswa_id:2, nama:'Siti Rahma',      judul:'Laporan PKL: Pengembangan Aplikasi Web dengan CodeIgniter',          tgl_submit:'2025-04-08', progres:60, status:'revisi',   catatan:'Bab III perlu diperbaiki, metodologi kurang detail.'},
+  {id:3, siswa_id:3, nama:'Dedi Kurniawan',  judul:'Laporan PKL: Perancangan Basis Data Sistem Inventaris',              tgl_submit:'2025-04-12', progres:90, status:'pending',  catatan:''},
+  {id:4, siswa_id:4, nama:'Rini Susanti',    judul:'Laporan PKL: Digitalisasi Layanan Publik Dinas Kominfo',             tgl_submit:'2025-03-30', progres:100,status:'approved', catatan:'Sangat baik dan lengkap!'},
+  {id:5, siswa_id:5, nama:'Fajar Hidayat',   judul:'Laporan PKL: Implementasi VLAN dan Jaringan Enterprise',             tgl_submit:'2025-04-01', progres:100,status:'approved', catatan:'Laporan sudah sangat baik.'},
+  {id:6, siswa_id:6, nama:'Dewi Anggraeni',  judul:'Laporan PKL: Desain UI/UX Aplikasi Mobile E-Commerce',               tgl_submit:'2025-04-05', progres:70, status:'revisi',   catatan:'Tambahkan wireframe dan user flow diagram.'},
+  {id:7, siswa_id:7, nama:'Rizky Ramadhan',  judul:'Laporan PKL: Pengembangan REST API dengan NodeJS dan Express',       tgl_submit:'2025-04-14', progres:50, status:'pending',  catatan:''},
+  {id:8, siswa_id:8, nama:'Maya Sari',        judul:'Laporan PKL: Pengelolaan Konten Digital Website BUMD',               tgl_submit:'2025-04-03', progres:100,status:'approved', catatan:'Sudah lengkap.'},
+];
+
+const absensiData = {
+  1: {1:'h',2:'h',3:'h',4:'i',5:'l',7:'h',8:'h',9:'h',10:'h',11:'h',12:'l',14:'h',15:'h',16:'h',17:'s',18:'h',19:'l',21:'h',22:'h',23:'h',24:'h',25:'h',26:'l',28:'h',29:'h',30:'h'},
+  2: {1:'h',2:'h',3:'h',4:'h',5:'l',7:'h',8:'h',9:'a',10:'h',11:'h',12:'l',14:'h',15:'h',16:'h',17:'h',18:'i',19:'l',21:'h',22:'h',23:'h',24:'h',25:'h',26:'l',28:'h',29:'h',30:'h'},
+  3: {1:'h',2:'h',3:'h',4:'h',5:'l',7:'h',8:'h',9:'h',10:'h',11:'h',12:'l',14:'h',15:'h',16:'h',17:'h',18:'h',19:'l',21:'h',22:'s',23:'s',24:'h',25:'h',26:'l',28:'h',29:'h',30:'h'},
+  4: {1:'h',2:'h',3:'i',4:'h',5:'l',7:'h',8:'h',9:'h',10:'h',11:'h',12:'l',14:'h',15:'h',16:'h',17:'h',18:'h',19:'l',21:'a',22:'h',23:'h',24:'h',25:'h',26:'l',28:'h',29:'h',30:'i'},
+  5: {1:'h',2:'h',3:'h',4:'h',5:'l',7:'h',8:'h',9:'h',10:'h',11:'h',12:'l',14:'h',15:'h',16:'h',17:'h',18:'h',19:'l',21:'h',22:'h',23:'h',24:'h',25:'h',26:'l',28:'h',29:'h',30:'h'},
+  6: {1:'h',2:'h',3:'h',4:'h',5:'l',7:'i',8:'i',9:'h',10:'h',11:'h',12:'l',14:'h',15:'h',16:'h',17:'h',18:'h',19:'l',21:'h',22:'h',23:'h',24:'h',25:'h',26:'l',28:'h',29:'h',30:'h'},
+  7: {1:'h',2:'h',3:'h',4:'h',5:'l',7:'h',8:'h',9:'h',10:'h',11:'a',12:'l',14:'h',15:'h',16:'h',17:'h',18:'h',19:'l',21:'h',22:'h',23:'s',24:'h',25:'h',26:'l',28:'h',29:'h',30:'h'},
+  8: {1:'h',2:'h',3:'h',4:'h',5:'l',7:'h',8:'h',9:'h',10:'h',11:'h',12:'l',14:'h',15:'h',16:'h',17:'i',18:'h',19:'l',21:'h',22:'h',23:'h',24:'h',25:'h',26:'l',28:'h',29:'h',30:'h'},
+};
+
+const bimbinganChats = {
+  1: [{from:'siswa',msg:'Pak, saya mau tanya soal cara backup database otomatis di Linux.',time:'08:30'},{from:'pembimbing',msg:'Bisa pakai cron job dengan mysqldump. Jadwalkan setiap malam jam 00:00.',time:'09:15'},{from:'siswa',msg:'Terima kasih Pak, sudah berhasil.',time:'10:00'}],
+  2: [{from:'siswa',msg:'Pak, ada error saat running composer install, ini outputnya: "Memory limit exhausted"',time:'09:00'},{from:'pembimbing',msg:'Tambahkan flag: `php -d memory_limit=-1 /usr/local/bin/composer install`. Coba lagi.',time:'09:45'}],
+  3: [{from:'siswa',msg:'Pak, apakah skema ERD saya sudah benar? Sudah saya kirim ke email bapak.',time:'10:00'},{from:'pembimbing',msg:'Sudah saya lihat. Secara umum bagus, tapi relasi tabel produk dan stok perlu diperbaiki. Gunakan many-to-many dengan tabel perantara.',time:'11:00'},{from:'siswa',msg:'Baik Pak, akan saya perbaiki. Terima kasih.',time:'11:10'}],
+  4: [{from:'siswa',msg:'Pak, mohon bimbingan untuk bab III laporan saya.',time:'13:00'},{from:'pembimbing',msg:'Metodologi penelitiannya perlu diperjelas. Jelaskan langkah-langkah implementasi secara sistematis.',time:'14:30'}],
+  5: [{from:'siswa',msg:'Pak, VLAN sudah berhasil dikonfigurasi, bisa di-test hari ini?',time:'08:00'},{from:'pembimbing',msg:'Bagus! Lanjutkan dengan dokumentasi konfigurasi untuk laporan.',time:'08:30'}],
+  6: [{from:'siswa',msg:'Pak, wireframe sudah selesai. Link Figma sudah saya share.',time:'15:00'},{from:'pembimbing',msg:'Sudah saya lihat, desainnya bagus dan modern. Lanjutkan dengan prototype interaktif.',time:'16:00'}],
+  7: [{from:'siswa',msg:'Pak, API endpoint-nya sudah jalan semua, tinggal dokumentasi Swagger.',time:'10:00'},{from:'pembimbing',msg:'Pastikan juga ada error handling yang baik dan validasi input di setiap endpoint.',time:'10:30'}],
+  8: [{from:'siswa',msg:'Pak, website BUMD sudah saya update kontennya untuk bulan April.',time:'09:00'},{from:'pembimbing',msg:'Baik. Jangan lupa backup file sebelum melakukan perubahan besar.',time:'09:30'}],
+};
+
+const nilaiData = [
+  {siswa_id:1, sikap:88, kehadiran:95, kompetensi:87, laporan:85, nilai_industri:90},
+  {siswa_id:2, sikap:82, kehadiran:90, kompetensi:80, laporan:78, nilai_industri:83},
+  {siswa_id:3, sikap:85, kehadiran:92, kompetensi:88, laporan:86, nilai_industri:87},
+  {siswa_id:4, sikap:78, kehadiran:85, kompetensi:75, laporan:80, nilai_industri:79},
+  {siswa_id:5, sikap:91, kehadiran:98, kompetensi:92, laporan:90, nilai_industri:94},
+  {siswa_id:6, sikap:87, kehadiran:93, kompetensi:85, laporan:88, nilai_industri:88},
+  {siswa_id:7, sikap:84, kehadiran:89, kompetensi:86, laporan:82, nilai_industri:86},
+  {siswa_id:8, sikap:83, kehadiran:91, kompetensi:81, laporan:84, nilai_industri:84},
+];
+
+const kompetensiList = [
+  {id:'k1', label:'Mampu mengidentifikasi kebutuhan sistem', cat:'Analisis'},
+  {id:'k2', label:'Mampu membuat dokumentasi teknis', cat:'Dokumentasi'},
+  {id:'k3', label:'Mampu bekerja dalam tim secara efektif', cat:'Soft Skills'},
+  {id:'k4', label:'Mampu mengoperasikan perangkat lunak khusus', cat:'Teknis'},
+  {id:'k5', label:'Mampu memecahkan masalah secara mandiri', cat:'Problem Solving'},
+  {id:'k6', label:'Mampu berkomunikasi dengan klien/atasan', cat:'Komunikasi'},
+  {id:'k7', label:'Mampu mengikuti prosedur kerja perusahaan', cat:'Profesionalisme'},
+  {id:'k8', label:'Mampu membuat laporan berkala', cat:'Dokumentasi'},
+  {id:'k9', label:'Mampu mengimplementasikan K3 di tempat kerja', cat:'K3'},
+  {id:'k10',label:'Mampu beradaptasi dengan lingkungan kerja baru', cat:'Soft Skills'},
+];
+
+const kompetensiStatus = {
+  1: {k1:true,k2:true,k3:true,k4:true,k5:true,k6:false,k7:true,k8:false,k9:true,k10:false},
+  2: {k1:true,k2:false,k3:true,k4:true,k5:false,k6:true,k7:true,k8:false,k9:false,k10:true},
+  3: {k1:true,k2:true,k3:true,k4:true,k5:true,k6:true,k7:true,k8:true,k9:false,k10:false},
+  4: {k1:false,k2:true,k3:true,k4:false,k5:true,k6:false,k7:true,k8:true,k9:false,k10:true},
+  5: {k1:true,k2:true,k3:true,k4:true,k5:true,k6:true,k7:true,k8:true,k9:true,k10:true},
+  6: {k1:true,k2:true,k3:true,k4:true,k5:false,k6:true,k7:true,k8:false,k9:true,k10:true},
+  7: {k1:true,k2:false,k3:true,k4:true,k5:true,k6:false,k7:true,k8:false,k9:false,k10:true},
+  8: {k1:true,k2:true,k3:true,k4:false,k5:true,k6:true,k7:true,k8:true,k9:false,k10:false},
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let currentPage = 'dashboard';
+let sidebarCollapsed = false;
+let jurnalFilter = 'all';
+let laporanFilter = 'all';
+let activeBimbinganId = 1;
+let activeKompId = 1;
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  updateClock();
+  setInterval(updateClock, 1000);
+  renderSiswaTable();
+  renderPenempatan();
+  renderJurnal();
+  renderAbsensiSelect();
+  renderAbsensiCalendar();
+  renderLaporan();
+  renderBimbinganList();
+  renderBimbinganChat(1);
+  renderNilai();
+  renderKompSiswaList();
+  renderKompetensi(1);
+
+  document.querySelectorAll('.sidebar-item[data-page]').forEach(el => {
+    el.addEventListener('click', () => navigateTo(el.dataset.page));
+  });
+
+  document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
+  document.getElementById('hamburger').addEventListener('click', toggleMobileSidebar);
+});
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function navigateTo(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  const pageEl = document.getElementById('page-'+page);
+  if (pageEl) pageEl.classList.add('active');
+  const sideEl = document.querySelector(`.sidebar-item[data-page="${page}"]`);
+  if (sideEl) sideEl.classList.add('active');
+  currentPage = page;
+  window.scrollTo({top:0,behavior:'smooth'});
+  if (window.innerWidth <= 768) closeMobileSidebar();
+}
+
+// ============================================================
+// SIDEBAR TOGGLE
+// ============================================================
+function toggleSidebar() {
+  sidebarCollapsed = !sidebarCollapsed;
+  document.getElementById('sidebar').classList.toggle('collapsed', sidebarCollapsed);
+  document.getElementById('mainContent').classList.toggle('sidebar-collapsed', sidebarCollapsed);
+  document.getElementById('sidebarToggle').classList.toggle('collapsed', sidebarCollapsed);
+  document.getElementById('toggleIcon').className = sidebarCollapsed ? 'fas fa-chevron-right' : 'fas fa-chevron-left';
+}
+
+function toggleMobileSidebar() {
+  document.getElementById('sidebar').classList.toggle('mobile-open');
+  document.getElementById('sidebarOverlay').classList.toggle('active');
+}
+function closeMobileSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebarOverlay').classList.remove('active');
+}
+
+// ============================================================
+// CLOCK
+// ============================================================
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock-display').textContent = now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('date-display').textContent = now.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  const ic = document.getElementById('toast-icon');
+  const icons = {success:'fas fa-check',error:'fas fa-times',info:'fas fa-info',warning:'fas fa-exclamation'};
+  const colors = {success:'#4ade80',error:'#ef4444',info:'#818cf8',warning:'#f59e0b'};
+  ic.innerHTML = `<i class="${icons[type]||icons.info}" style="color:${colors[type]||colors.info};font-size:.75rem"></i>`;
+  ic.style.background = colors[type]+'20';
+  document.getElementById('toast-msg').textContent = msg;
+  t.className = `toast ${type}`;
+  setTimeout(() => t.className = 'toast hidden', 3000);
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+// ============================================================
+// DAFTAR SISWA
+// ============================================================
+function getStatusPill(s) {
+  const map = {aktif:'pill-green',nonaktif:'pill-red',cuti:'pill-yellow'};
+  return `<span class="pill ${map[s]||'pill-gray'}">${s.toUpperCase()}</span>`;
+}
+function renderSiswaTable(data) {
+  const list = data || siswaData;
+  const tb = document.getElementById('siswa-tbody');
+  tb.innerHTML = list.map((s,i)=>`
+  <tr>
+    <td style="color:#64748b;font-weight:600">${i+1}</td>
+    <td>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:34px;height:34px;border-radius:50%;background:${s.color}22;border:1px solid ${s.color}44;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:${s.color}">${s.inisial}</div>
+        <div>
+          <div style="font-weight:600;color:#f1f5f9">${s.nama}</div>
+          <div style="font-size:.72rem;color:#64748b">${s.kontak}</div>
+        </div>
+      </div>
+    </td>
+    <td><code style="background:rgba(255,255,255,.05);padding:3px 8px;border-radius:5px;font-size:.78rem;color:#94a3b8">${s.nis}</code></td>
+    <td><span class="pill pill-blue">${s.kelas}</span></td>
+    <td style="font-size:.82rem;color:#94a3b8">${s.tempat}</td>
+    <td>${getStatusPill(s.status)}</td>
+    <td style="text-align:center">
+      <div style="display:flex;gap:5px;justify-content:center">
+        <button class="btn-action btn-view" onclick="showSiswaDetail(${s.id})" title="Detail"><i class="fas fa-eye"></i></button>
+        <button class="btn-action btn-edit" onclick="showToast('Fitur edit akan segera tersedia','info')" title="Edit"><i class="fas fa-edit"></i></button>
+      </div>
+    </td>
+  </tr>`).join('');
+}
+function filterSiswa() {
+  const q = document.getElementById('search-siswa').value.toLowerCase();
+  const k = document.getElementById('filter-kelas').value;
+  const filtered = siswaData.filter(s =>
+    (s.nama.toLowerCase().includes(q) || s.nis.includes(q) || s.tempat.toLowerCase().includes(q)) &&
+    (!k || s.kelas === k)
+  );
+  renderSiswaTable(filtered);
+}
+function showSiswaDetail(id) {
+  const s = siswaData.find(x=>x.id===id);
+  if(!s) return;
+  document.getElementById('modal-siswa-nama').textContent = s.nama;
+  const jurnal_count = jurnalData.filter(j=>j.siswa_id===id).length;
+  const valid_jurnal = jurnalData.filter(j=>j.siswa_id===id&&j.status==='valid').length;
+  document.getElementById('modal-siswa-content').innerHTML = `
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;padding:16px;background:${s.color}11;border:1px solid ${s.color}22;border-radius:12px">
+      <div style="width:52px;height:52px;border-radius:50%;background:${s.color}22;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:${s.color}">${s.inisial}</div>
+      <div>
+        <div style="font-weight:700;color:#f1f5f9;font-size:1rem">${s.nama}</div>
+        <div style="font-size:.78rem;color:#64748b">${s.kelas} · ${s.nis}</div>
+      </div>
+    </div>
+    <div class="detail-row"><span class="detail-label"><i class="fas fa-building" style="margin-right:6px"></i>Tempat PKL</span><span class="detail-value">${s.tempat}</span></div>
+    <div class="detail-row"><span class="detail-label"><i class="fas fa-map-marker-alt" style="margin-right:6px"></i>Alamat</span><span class="detail-value" style="font-size:.8rem">${s.alamat}</span></div>
+    <div class="detail-row"><span class="detail-label"><i class="fas fa-phone" style="margin-right:6px"></i>Kontak</span><span class="detail-value">${s.kontak}</span></div>
+    <div class="detail-row"><span class="detail-label"><i class="fas fa-book-open" style="margin-right:6px"></i>Total Jurnal</span><span class="detail-value">${jurnal_count} entri (${valid_jurnal} valid)</span></div>
+    <div class="detail-row"><span class="detail-label"><i class="fas fa-circle" style="margin-right:6px"></i>Status</span><span class="detail-value">${getStatusPill(s.status)}</span></div>
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <button class="btn btn-warning btn-sm" style="flex:1;justify-content:center" onclick="closeModal('modal-siswa-detail');navigateTo('jurnal')"><i class="fas fa-book-open"></i> Lihat Jurnal</button>
+      <button class="btn btn-sm" style="flex:1;justify-content:center;background:rgba(99,102,241,.1);color:#818cf8;border:1px solid rgba(99,102,241,.2)" onclick="closeModal('modal-siswa-detail');navigateTo('bimbingan')"><i class="fas fa-comments"></i> Bimbingan</button>
+    </div>`;
+  openModal('modal-siswa-detail');
+}
+
+// ============================================================
+// PENEMPATAN
+// ============================================================
+function renderPenempatan() {
+  const icons = ['fas fa-laptop-code','fas fa-network-wired','fas fa-paint-brush','fas fa-server','fas fa-globe','fas fa-database','fas fa-code','fas fa-cog'];
+  const colors = ['#6366f1','#2dd4bf','#ec4899','#3b82f6','#8b5cf6','#f59e0b','#ef4444','#10b981'];
+  const grid = document.getElementById('penempatan-grid');
+  grid.innerHTML = siswaData.map((s,i) => `
+    <div class="location-card" onclick="showToast('Detail penempatan ${s.nama}','info')">
+      <div class="location-icon" style="background:${colors[i]}15;color:${colors[i]}"><i class="${icons[i]}"></i></div>
+      <div style="font-weight:600;color:#f1f5f9;font-size:.9rem;margin-bottom:4px">${s.tempat}</div>
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+        <div style="width:24px;height:24px;border-radius:50%;background:${s.color}22;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:${s.color}">${s.inisial}</div>
+        <span style="font-size:.8rem;color:#94a3b8">${s.nama} · ${s.kelas}</span>
+      </div>
+      <div style="font-size:.75rem;color:#64748b"><i class="fas fa-map-marker-alt" style="margin-right:4px"></i>${s.alamat.split(',').slice(-1)[0].trim()}</div>
+      <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+        <span class="pill pill-green" style="font-size:.65rem">AKTIF</span>
+        <span style="font-size:.72rem;color:#64748b">Jan – Jun 2025</span>
+      </div>
+    </div>`).join('');
+}
+
+// ============================================================
+// JURNAL
+// ============================================================
+function renderJurnal(data) {
+  let list = data || jurnalData;
+  if (jurnalFilter !== 'all') list = list.filter(j => j.status === jurnalFilter);
+  const q = document.getElementById('search-jurnal').value.toLowerCase();
+  if (q) list = list.filter(j => j.nama.toLowerCase().includes(q) || j.kegiatan.toLowerCase().includes(q));
+  const tb = document.getElementById('jurnal-tbody');
+  if (!list.length) { tb.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:#8e8ea9">Belum ada data jurnal.</td></tr>`; return; }
+  tb.innerHTML = list.map(d => {
+    const s = siswaData.find(x=>x.id===d.siswa_id);
+    const pill = d.status==='valid'?'pill-green':d.status==='tolak'?'pill-red':'pill-yellow';
+    const tgl = new Date(d.tanggal).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});
+    const actions = d.status==='pending'
+      ? `<button class="btn-action btn-approve" onclick="validasiJurnal(${d.id},'valid')" title="Setujui"><i class="fas fa-check"></i></button>
+         <button class="btn-action btn-reject" onclick="validasiJurnal(${d.id},'tolak')" title="Tolak"><i class="fas fa-times"></i></button>`
+      : `<span style="color:#64748b;font-size:.78rem">Selesai</span>`;
+    return `<tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:30px;height:30px;border-radius:50%;background:${s?s.color+'22':'rgba(255,255,255,.06)'};display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:${s?s.color:'#94a3b8'}">${s?s.inisial:'?'}</div>
+          <span style="font-weight:600;color:#f1f5f9">${d.nama}</span>
+        </div>
+      </td>
+      <td>
+        <div style="font-size:.88rem">${tgl}</div>
+        <div style="font-size:.75rem;color:#64748b">${d.jam_masuk} – ${d.jam_keluar}</div>
+      </td>
+      <td><div style="font-size:.83rem;max-width:260px;white-space:normal;line-height:1.5;color:#94a3b8">${d.kegiatan.substring(0,100)}${d.kegiatan.length>100?'...':''}</div></td>
+      <td><span class="pill ${pill}">${d.status.toUpperCase()}</span></td>
+      <td style="text-align:center">
+        <div style="display:flex;gap:5px;justify-content:center">
+          <button class="btn-action btn-view" onclick="showJurnalDetail(${d.id})" title="Detail"><i class="fas fa-eye"></i></button>
+          ${actions}
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function validasiJurnal(id, status) {
+  const j = jurnalData.find(x=>x.id===id);
+  if (!j) return;
+  j.status = status;
+  renderJurnal();
+  updateBadges();
+  showToast(status==='valid'?'Jurnal berhasil divalidasi!':'Jurnal ditolak.', status==='valid'?'success':'error');
+}
+
+function setJurnalFilter(f, el) {
+  jurnalFilter = f;
+  document.querySelectorAll('#page-jurnal .tab-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderJurnal();
+}
+function filterJurnal() { renderJurnal(); }
+
+function showJurnalDetail(id) {
+  const d = jurnalData.find(x=>x.id===id);
+  const s = siswaData.find(x=>x.id===d.siswa_id);
+  const tgl = new Date(d.tanggal).toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const pill = d.status==='valid'?'pill-green':d.status==='tolak'?'pill-red':'pill-yellow';
+  document.getElementById('modal-jurnal-content').innerHTML = `
+    <div class="detail-row"><span class="detail-label">Siswa</span><span class="detail-value">${d.nama}</span></div>
+    <div class="detail-row"><span class="detail-label">Tanggal</span><span class="detail-value">${tgl}</span></div>
+    <div class="detail-row"><span class="detail-label">Jam</span><span class="detail-value">${d.jam_masuk} – ${d.jam_keluar}</span></div>
+    <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value"><span class="pill ${pill}">${d.status.toUpperCase()}</span></span></div>
+    <div style="margin-top:16px">
+      <div style="font-size:.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Uraian Kegiatan</div>
+      <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;font-size:.875rem;color:#cbd5e1;line-height:1.7">${d.kegiatan}</div>
+    </div>
+    ${d.status==='pending'?`
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <button class="btn btn-success btn-sm" style="flex:1;justify-content:center" onclick="validasiJurnal(${d.id},'valid');closeModal('modal-jurnal-detail')"><i class="fas fa-check"></i> Setujui</button>
+      <button class="btn btn-danger btn-sm" style="flex:1;justify-content:center" onclick="validasiJurnal(${d.id},'tolak');closeModal('modal-jurnal-detail')"><i class="fas fa-times"></i> Tolak</button>
+    </div>`:''}`;
+  openModal('modal-jurnal-detail');
+}
+
+function updateBadges() {
+  const pj = jurnalData.filter(j=>j.status==='pending').length;
+  const pl = laporanData.filter(l=>l.status==='pending').length;
+  document.getElementById('badge-jurnal').textContent = pj;
+  document.getElementById('badge-laporan').textContent = pl;
+  document.getElementById('dash-pending-jurnal').textContent = pj;
+  document.getElementById('dash-pending-laporan').textContent = pl;
+  if (pj === 0) document.getElementById('badge-jurnal').style.display='none';
+  if (pl === 0) document.getElementById('badge-laporan').style.display='none';
+}
+
+// ============================================================
+// ABSENSI
+// ============================================================
+function renderAbsensiSelect() {
+  const sel = document.getElementById('absensi-siswa-select');
+  sel.innerHTML = siswaData.map(s=>`<option value="${s.id}">${s.nama}</option>`).join('');
+}
+
+function renderAbsensiCalendar() {
+  const sid = parseInt(document.getElementById('absensi-siswa-select').value) || 1;
+  const data = absensiData[sid] || {};
+  const days = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+  const firstDay = new Date(2025,3,1).getDay();
+  const totalDays = 30;
+  const cal = document.getElementById('absensi-calendar');
+  const colorMap = {h:'hadir',i:'izin',s:'sakit',a:'alpha',l:'libur'};
+  let html = days.map(d=>`<div class="cal-header">${d}</div>`).join('');
+  for(let i=0;i<firstDay;i++) html+=`<div class="cal-day empty"></div>`;
+  for(let d=1;d<=totalDays;d++) {
+    const type = data[d];
+    const cls = type ? colorMap[type] : '';
+    const today = d===16?'today':'';
+    html+=`<div class="cal-day ${cls} ${today}" title="${type?{h:'Hadir',i:'Izin',s:'Sakit',a:'Alpha',l:'Libur'}[type]:'-'}">${d}</div>`;
+  }
+  cal.innerHTML = html;
+  renderAbsensiRekap(sid);
+}
+
+function renderAbsensiRekap(sid) {
+  const data = absensiData[sid] || {};
+  const count = {h:0,i:0,s:0,a:0,l:0};
+  Object.values(data).forEach(v=>count[v]=(count[v]||0)+1);
+  const items = [{label:'Hadir',key:'h',color:'#4ade80'},{label:'Izin',key:'i',color:'#f59e0b'},{label:'Sakit',key:'s',color:'#818cf8'},{label:'Alpha',key:'a',color:'#ef4444'},{label:'Libur',key:'l',color:'#475569'}];
+  document.getElementById('absensi-rekap').innerHTML = items.map(it=>`
+    <div class="detail-row">
+      <span class="detail-label" style="color:${it.color}"><i class="fas fa-circle" style="font-size:.5rem;margin-right:6px"></i>${it.label}</span>
+      <span class="detail-value">${count[it.key]||0} hari</span>
+    </div>`).join('');
+  const total = Object.values(data).length;
+  const hadir = count.h||0;
+  document.getElementById('absensi-total').innerHTML = `
+    <div class="detail-row"><span class="detail-label">Total Hari Kerja</span><span class="detail-value">${total-(count.l||0)} hari</span></div>
+    <div class="detail-row"><span class="detail-label">Kehadiran</span><span class="detail-value" style="color:#4ade80">${Math.round(hadir/(total-(count.l||0))*100)||0}%</span></div>`;
+}
+
+// ============================================================
+// LAPORAN
+// ============================================================
+function renderLaporan(data) {
+  let list = data || laporanData;
+  if (laporanFilter !== 'all') list = list.filter(l => l.status === laporanFilter);
+  const tb = document.getElementById('laporan-tbody');
+  const statusMap = {pending:{pill:'pill-yellow',label:'PENDING'},approved:{pill:'pill-green',label:'DISETUJUI'},revisi:{pill:'pill-red',label:'REVISI'}};
+  if(!list.length){tb.innerHTML=`<tr><td colspan="6" style="text-align:center;padding:40px;color:#8e8ea9">Tidak ada data laporan.</td></tr>`;return;}
+  tb.innerHTML = list.map(l => {
+    const s = siswaData.find(x=>x.id===l.siswa_id);
+    const st = statusMap[l.status] || statusMap.pending;
+    const tgl = new Date(l.tgl_submit).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});
+    const acts = l.status==='pending'
+      ? `<button class="btn-action btn-approve" onclick="validasiLaporan(${l.id},'approved')" title="Setujui"><i class="fas fa-check"></i></button>
+         <button class="btn-action btn-reject" onclick="validasiLaporan(${l.id},'revisi')" title="Revisi"><i class="fas fa-redo"></i></button>`
+      : `<span style="color:#64748b;font-size:.78rem">Selesai</span>`;
+    return `<tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:30px;height:30px;border-radius:50%;background:${s?s.color+'22':'rgba(255,255,255,.06)'};display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:${s?s.color:'#94a3b8'}">${s?s.inisial:'?'}</div>
+          <span style="font-weight:600;color:#f1f5f9">${l.nama}</span>
+        </div>
+      </td>
+      <td><div style="font-size:.82rem;max-width:220px;line-height:1.4;color:#94a3b8">${l.judul}</div></td>
+      <td style="font-size:.82rem">${tgl}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="progress-bar" style="width:80px"><div class="progress-fill" style="width:${l.progres}%;background:${l.progres===100?'#4ade80':l.progres>60?'#f59e0b':'#ef4444'}"></div></div>
+          <span style="font-size:.75rem;color:#94a3b8">${l.progres}%</span>
+        </div>
+      </td>
+      <td><span class="pill ${st.pill}">${st.label}</span></td>
+      <td style="text-align:center">
+        <div style="display:flex;gap:5px;justify-content:center">
+          <button class="btn-action btn-view" onclick="showLaporanDetail(${l.id})" title="Detail"><i class="fas fa-eye"></i></button>
+          ${acts}
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function validasiLaporan(id, status) {
+  const l = laporanData.find(x=>x.id===id);
+  if (!l) return;
+  l.status = status;
+  if (status==='approved') l.progres = 100;
+  renderLaporan();
+  updateBadges();
+  showToast(status==='approved'?'Laporan disetujui!':'Laporan dikembalikan untuk revisi.', status==='approved'?'success':'warning');
+}
+
+function setLaporanFilter(f, el) {
+  laporanFilter = f;
+  document.querySelectorAll('#page-laporan .tab-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderLaporan();
+}
+
+function showLaporanDetail(id) {
+  const l = laporanData.find(x=>x.id===id);
+  const st = {pending:'pill-yellow pending',approved:'pill-green',revisi:'pill-red'};
+  document.getElementById('modal-laporan-title').textContent = 'Detail Laporan – '+l.nama;
+  document.getElementById('modal-laporan-content').innerHTML = `
+    <div class="detail-row"><span class="detail-label">Judul</span><span class="detail-value" style="font-size:.82rem;text-align:right">${l.judul}</span></div>
+    <div class="detail-row"><span class="detail-label">Tgl Submit</span><span class="detail-value">${new Date(l.tgl_submit).toLocaleDateString('id-ID')}</span></div>
+    <div class="detail-row"><span class="detail-label">Progres</span><span class="detail-value" style="color:#4ade80">${l.progres}%</span></div>
+    <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value"><span class="pill ${st[l.status]||'pill-yellow'}">${l.status.toUpperCase()}</span></span></div>
+    ${l.catatan?`<div style="margin-top:14px;padding:12px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:8px;font-size:.83rem;color:#f59e0b"><i class="fas fa-comment-alt" style="margin-right:6px"></i>${l.catatan}</div>`:''}
+    ${l.status==='pending'?`
+    <div style="margin-top:16px">
+      <div class="form-group"><label class="form-label">Catatan Revisi (opsional)</label><textarea class="form-control" id="catatan-laporan-${l.id}" placeholder="Tulis catatan jika ada revisi..."></textarea></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-success btn-sm" style="flex:1;justify-content:center" onclick="validasiLaporan(${l.id},'approved');closeModal('modal-laporan-detail')"><i class="fas fa-check"></i> Setujui</button>
+        <button class="btn btn-warning btn-sm" style="flex:1;justify-content:center" onclick="simpanCatatanRevisi(${l.id})"><i class="fas fa-redo"></i> Revisi</button>
+      </div>
+    </div>`:''}`;
+  openModal('modal-laporan-detail');
+}
+
+function simpanCatatanRevisi(id) {
+  const l = laporanData.find(x=>x.id===id);
+  const catatan = document.getElementById('catatan-laporan-'+id);
+  if (l && catatan) l.catatan = catatan.value || 'Mohon diperbaiki sesuai arahan pembimbing.';
+  validasiLaporan(id,'revisi');
+  closeModal('modal-laporan-detail');
+}
+
+// ============================================================
+// BIMBINGAN
+// ============================================================
+function renderBimbinganList() {
+  const list = document.getElementById('bimbingan-list');
+  list.innerHTML = siswaData.map(s => `
+    <div class="sidebar-item ${s.id===activeBimbinganId?'active':''}" onclick="selectBimbingan(${s.id})" style="gap:8px;padding:8px 10px">
+      <div style="width:28px;height:28px;border-radius:50%;background:${s.color}22;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;color:${s.color};flex-shrink:0">${s.inisial}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:.82rem;color:#f1f5f9;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.nama}</div>
+        <div style="font-size:.7rem;color:#64748b">${s.kelas}</div>
+      </div>
+    </div>`).join('');
+}
+
+function selectBimbingan(id) {
+  activeBimbinganId = id;
+  const s = siswaData.find(x=>x.id===id);
+  document.getElementById('bimbingan-avatar').textContent = s.inisial;
+  document.getElementById('bimbingan-avatar').style.background = `linear-gradient(135deg,${s.color},${s.color}99)`;
+  document.getElementById('bimbingan-nama').textContent = s.nama;
+  document.getElementById('bimbingan-kelas').textContent = `${s.kelas} · ${s.tempat}`;
+  renderBimbinganChat(id);
+  renderBimbinganList();
+}
+
+function renderBimbinganChat(id) {
+  const chats = bimbinganChats[id] || [];
+  const container = document.getElementById('chat-container');
+  container.innerHTML = chats.map(c => `
+    <div style="display:flex;flex-direction:column;align-items:${c.from==='pembimbing'?'flex-end':'flex-start'}">
+      <div style="font-size:.68rem;color:#475569;margin-bottom:3px">${c.from==='pembimbing'?'Anda':siswaData.find(x=>x.id===id)?.nama||'Siswa'} · ${c.time}</div>
+      <div class="chat-bubble ${c.from}">${c.msg}</div>
+    </div>`).join('');
+  container.scrollTop = container.scrollHeight;
+}
+
+function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  if (!bimbinganChats[activeBimbinganId]) bimbinganChats[activeBimbinganId] = [];
+  const now = new Date();
+  bimbinganChats[activeBimbinganId].push({from:'pembimbing',msg,time:`${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`});
+  input.value = '';
+  renderBimbinganChat(activeBimbinganId);
+  showToast('Pesan terkirim','success');
+}
+
+// ============================================================
+// INPUT NILAI
+// ============================================================
+function calcTotal(sid) {
+  const n = nilaiData.find(x=>x.siswa_id===sid);
+  if(!n) return 0;
+  return Math.round((n.sikap*0.15 + n.kehadiran*0.2 + n.kompetensi*0.3 + n.laporan*0.2 + n.nilai_industri*0.15));
+}
+function getPredikat(v) {
+  if(v>=90)return{label:'A (Sangat Baik)',color:'#4ade80'};
+  if(v>=80)return{label:'B (Baik)',color:'#818cf8'};
+  if(v>=70)return{label:'C (Cukup)',color:'#f59e0b'};
+  return{label:'D (Kurang)',color:'#ef4444'};
+}
+function renderNilai() {
+  const container = document.getElementById('nilai-cards');
+  container.innerHTML = siswaData.map(s => {
+    const n = nilaiData.find(x=>x.siswa_id===s.id) || {};
+    const total = calcTotal(s.id);
+    const pred = getPredikat(total);
+    const fields = [
+      {key:'sikap',label:'Sikap & Kedisiplinan',weight:'15%'},
+      {key:'kehadiran',label:'Kehadiran',weight:'20%'},
+      {key:'kompetensi',label:'Kompetensi Teknis',weight:'30%'},
+      {key:'laporan',label:'Laporan PKL',weight:'20%'},
+      {key:'nilai_industri',label:'Nilai dari Industri',weight:'15%'},
+    ];
+    return `<div class="nilai-card" id="nilai-${s.id}">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;border-radius:50%;background:${s.color}22;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:${s.color}">${s.inisial}</div>
+          <div>
+            <div style="font-weight:600;color:#f1f5f9">${s.nama}</div>
+            <div style="font-size:.72rem;color:#64748b">${s.kelas}</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:1.6rem;font-weight:700;color:#f1f5f9" id="total-${s.id}">${total}</div>
+          <div style="font-size:.72rem;color:${pred.color};font-weight:600" id="pred-${s.id}">${pred.label}</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
+        ${fields.map(f=>`
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+            <span style="font-size:.75rem;color:#64748b">${f.label} <span style="color:#334155">(${f.weight})</span></span>
+            <span style="font-size:.78rem;font-weight:600;color:#f1f5f9" id="val-${s.id}-${f.key}">${n[f.key]||0}</span>
+          </div>
+          <input type="range" class="nilai-slider" min="0" max="100" value="${n[f.key]||0}" 
+            oninput="updateNilai(${s.id},'${f.key}',this.value)">
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateNilai(sid, key, val) {
+  const n = nilaiData.find(x=>x.siswa_id===sid);
+  if(n) n[key] = parseInt(val);
+  document.getElementById(`val-${sid}-${key}`).textContent = val;
+  const total = calcTotal(sid);
+  const pred = getPredikat(total);
+  document.getElementById(`total-${sid}`).textContent = total;
+  const predEl = document.getElementById(`pred-${sid}`);
+  predEl.textContent = pred.label;
+  predEl.style.color = pred.color;
+}
+
+function saveAllNilai() {
+  showToast('Semua nilai berhasil disimpan!','success');
+}
+
+// ============================================================
+// KOMPETENSI
+// ============================================================
+function renderKompSiswaList() {
+  const list = document.getElementById('komp-siswa-list');
+  list.innerHTML = siswaData.map(s => `
+    <div class="sidebar-item ${s.id===activeKompId?'active':''}" onclick="renderKompetensi(${s.id})" style="gap:8px;padding:8px 10px">
+      <div style="width:28px;height:28px;border-radius:50%;background:${s.color}22;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;color:${s.color};flex-shrink:0">${s.inisial}</div>
+      <div style="font-size:.82rem;color:#f1f5f9;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.nama}</div>
+    </div>`).join('');
+}
+
+function renderKompetensi(sid) {
+  activeKompId = sid;
+  renderKompSiswaList();
+  const s = siswaData.find(x=>x.id===sid);
+  const status = kompetensiStatus[sid] || {};
+  const checked = Object.values(status).filter(Boolean).length;
+  document.getElementById('komp-title').textContent = `Kompetensi ${s.nama}`;
+  document.getElementById('komp-progress-text').textContent = `${checked}/${kompetensiList.length} tercapai`;
+  document.getElementById('komp-bar').style.width = `${Math.round(checked/kompetensiList.length*100)}%`;
+  document.getElementById('komp-list').innerHTML = kompetensiList.map(k => `
+    <div class="komp-item">
+      <div class="komp-check ${status[k.id]?'checked':''}" onclick="toggleKomp(${sid},'${k.id}',this)">
+        ${status[k.id]?'<i class="fas fa-check" style="font-size:.65rem"></i>':''}
+      </div>
+      <div class="komp-label">${k.label}<small>${k.cat}</small></div>
+    </div>`).join('');
+}
+
+function toggleKomp(sid, kid, el) {
+  if(!kompetensiStatus[sid]) kompetensiStatus[sid]={};
+  kompetensiStatus[sid][kid] = !kompetensiStatus[sid][kid];
+  const checked = kompetensiStatus[sid][kid];
+  el.classList.toggle('checked', checked);
+  el.innerHTML = checked?'<i class="fas fa-check" style="font-size:.65rem"></i>':'';
+  const total = Object.values(kompetensiStatus[sid]).filter(Boolean).length;
+  document.getElementById('komp-progress-text').textContent = `${total}/${kompetensiList.length} tercapai`;
+  document.getElementById('komp-bar').style.width = `${Math.round(total/kompetensiList.length*100)}%`;
+}
+
+function saveKompetensi() {
+  showToast('Penilaian kompetensi berhasil disimpan!','success');
+}
+
+// ============================================================
+// LOGOUT
+// ============================================================
+function confirmLogout() {
+  if(confirm('Yakin ingin keluar dari sistem SIMPKL?')) {
+    document.body.style.opacity='0.5';
+    document.body.style.pointerEvents='none';
+    showToast('Logging out...','info');
+    setTimeout(()=>{document.body.style.opacity='1';document.body.style.pointerEvents='auto';showToast('Anda telah keluar','info');},2000);
+  }
+}
+
+
+</script>
+</body>
+</html>
